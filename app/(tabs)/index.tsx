@@ -1,5 +1,9 @@
 import { Image } from 'expo-image';
+import { useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
+
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
@@ -8,6 +12,20 @@ import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
 
 export default function HomeScreen() {
+
+  useEffect(() => {
+    async function testFirebase() {
+      try {
+        const snap = await getDocs(collection(db, "test"));
+        console.log("🔥 Firebase connected successfully!");
+      } catch (err: any) {
+        console.log("❌ Firebase error:", err.message);
+      }
+    }
+
+    testFirebase();
+  }, []);
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
