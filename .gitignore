@@ -41,3 +41,19 @@ app-example
 # generated native folders
 /ios
 /android
+
+# =========================
+# Python / MoveNet Backend
+# =========================
+movenet-python/venv/
+movenet-python/__pycache__/
+movenet-python/*.pyc
+movenet-python/*.pyo
+movenet-python/.env
+movenet-python/serviceAccountKey.json
+movenet-python/.python-version
+
+# Jupyter / ML cache
+.ipynb_checkpoints/
+*.onnx
+*.tflite
