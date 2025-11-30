@@ -1,8 +1,10 @@
 import "@mediapipe/pose";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as tf from "@tensorflow/tfjs";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
+import { exerciseMap } from "../exerciseMap/exerciseMap";
+
 
 // Define skeleton connections: pairs of keypoint indices
 const SKELETON_CONNECTIONS: [number, number][] = [
@@ -29,11 +31,12 @@ const SKELETON_CONNECTIONS: [number, number][] = [
 const PoseDetector: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [currentExercise, setCurrentExercise] = useState("squat");
 
   useEffect(() => {
     let animationFrameId: number;
 
-    const runMoveNet = async () => {
+    const runDetector = async () => {
       await tf.setBackend("webgl");
       await tf.ready();
 
@@ -73,7 +76,15 @@ const PoseDetector: React.FC = () => {
           if (poses.length > 0) {
             drawKeypoints(poses[0].keypoints, ctx);
             drawSkeleton(poses[0].keypoints, ctx); // draw skeleton lines
-        }
+            
+            console.log("Current Exercise:", currentExercise);
+            
+            // Call the current exercise detector
+            const detectorFunc = exerciseMap[currentExercise];
+            if (detectorFunc) {
+              detectorFunc(poses[0].keypoints, ctx);
+            }
+          }
         }
 
         animationFrameId = requestAnimationFrame(detect);
@@ -112,7 +123,7 @@ const PoseDetector: React.FC = () => {
       });
     };
 
-    runMoveNet();
+    runDetector();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
@@ -122,7 +133,7 @@ const PoseDetector: React.FC = () => {
           .forEach((track) => track.stop());
       }
     };
-  }, []);
+  }, [currentExercise]);
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
